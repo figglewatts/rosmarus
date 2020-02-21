@@ -1,0 +1,27 @@
+{
+    "rdocCaptureSettings": 1,
+    "settings": {
+        "autoStart": false,
+        "commandLine": "functionality.py",
+        "environment": [
+        ],
+        "executable": "C:\\Users\\figgl\\.virtualenvs\\rosmarus-iVM6dEPg\\Scripts\\python.exe",
+        "inject": false,
+        "numQueuedFrames": 1,
+        "options": {
+            "allowFullscreen": true,
+            "allowVSync": true,
+            "apiValidation": true,
+            "captureAllCmdLists": false,
+            "captureCallstacks": false,
+            "captureCallstacksOnlyDraws": false,
+            "debugOutputMute": true,
+            "delayForDebugger": 0,
+            "hookIntoChildren": false,
+            "refAllResources": false,
+            "verifyBufferAccess": false
+        },
+        "queuedFrameCap": 1,
+        "workingDir": "C:/Users/figgl/Documents/projects/rosmarus"
+    }
+}
