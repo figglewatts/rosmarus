@@ -12,10 +12,12 @@ class Framebuffer:
                  height: int,
                  fb_type: GL.GLenum,
                  color_attachments: List[Texture2D] = None,
-                 depth_attachment: Texture2D = None) -> None:
+                 depth_attachment: Texture2D = None,
+                 scale_viewport: bool = False) -> None:
         self._width = width
         self._height = height
         self._type = fb_type
+        self._scale_viewport = scale_viewport
         self._handle = GL.glGenFramebuffers(1)
         self._color_attachments = []
         if color_attachments is None:
@@ -84,10 +86,15 @@ class Framebuffer:
         return self._depth_attachment
 
     def bind(self) -> None:
+        self.cached_viewport = self._get_current_viewport_size()
+        if self._scale_viewport:
+            GL.glViewport(0, 0, int(self._width), int(self._height))
         GL.glBindFramebuffer(self._type, self._handle)
 
     def unbind(self) -> None:
         GL.glBindFramebuffer(self._type, 0)
+        if self._scale_viewport:
+            GL.glViewport(*self.cached_viewport)
 
     def resize(self, width: int, height: int) -> None:
         # recreate all of the color attachments with the new size
@@ -99,3 +106,7 @@ class Framebuffer:
 
         self._width = width
         self._height = height
+
+    def _get_current_viewport_size(self) -> Tuple[int, int, int, int]:
+        viewport = GL.glGetIntegerv(GL.GL_VIEWPORT)
+        return tuple(viewport)

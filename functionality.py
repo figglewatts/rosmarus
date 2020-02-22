@@ -12,7 +12,7 @@ from rosmarus import resources
 from rosmarus.io import shader_handler
 from rosmarus.math import transform
 from rosmarus.graphics.camera import Camera
-from rosmarus.graphics.framebuffer import Framebuffer
+from rosmarus.graphics.upscale_surface import UpscaleSurface
 
 
 def main():
@@ -22,8 +22,6 @@ def main():
         t = transform.Transform2D()
         shader: Shader = resources.load(
             "shader", "functionality_data/shaders/main.shader")
-        fb_shader: Shader = resources.load(
-            "shader", "functionality_data/shaders/render_framebuffer.shader")
 
         shader.bind()
         t.translate((80, 80))
@@ -37,35 +35,21 @@ def main():
         shader.set_mat4("ProjectionMatrix", proj_m)
         shader.unbind()
 
-        fb = Framebuffer(window.width / 4, window.height / 4,
-                         GL.GL_FRAMEBUFFER)
+        uss = UpscaleSurface(window.width / 4, window.height / 4)
 
         GL.glClearColor(1, 0, 0, 1)
 
-        def render_scene():
+        while not glfw.window_should_close(window.glfw_window):
+            uss.begin()
             GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
             shader.bind()
             t.rotate(0.001, False)
             shader.set_mat4("ModelMatrix", t.matrix())
             m.render()
             shader.unbind()
+            uss.end()
 
-        def render_fb():
-            GL.glClear(GL.GL_COLOR_BUFFER_BIT)
-            GL.glDisable(GL.GL_DEPTH_TEST)
-            fb_shader.bind()
-            fb.get_texture(0).bind()
-            m.render()
-            fb.get_texture(0).unbind()
-            fb_shader.unbind()
-            GL.glEnable(GL.GL_DEPTH_TEST)
-
-        while not glfw.window_should_close(window.glfw_window):
-            fb.bind()
-            render_scene()
-            fb.unbind()
-
-            render_fb()
+            uss.render()
 
             glfw.swap_buffers(window.glfw_window)
             glfw.poll_events()
