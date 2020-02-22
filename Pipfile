@@ -14,6 +14,7 @@ pyopengl-accelerate = "*"
 glfw = "*"
 pyglm = "*"
 pyyaml = "*"
+pillow = "*"
 
 [requires]
 python_version = "3.7"

@@ -12,16 +12,23 @@ shaders:
         uniform mat4 ViewMatrix;
         uniform mat4 ProjectionMatrix;
 
+        out vec2 TexCoords;
+
         void main()
         {
             gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(in_Pos, 1.0);
+            TexCoords = in_UV;
         }
     fragment: |
         #version 330 core
 
         out vec4 out_FragColor;
 
+        in vec2 TexCoords;
+
+        uniform sampler2D MainTex;
+
         void main()
         {
-            out_FragColor = vec4(0, 1, 1, 1);
+            out_FragColor = texture(MainTex, TexCoords);
         }
