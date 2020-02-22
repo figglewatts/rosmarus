@@ -73,3 +73,12 @@ class Mesh:
         GL.glDeleteBuffers(1, self.vbo)
         GL.glDeleteBuffers(1, self.ebo)
         GL.glDeleteVertexArrays(1, self.vao)
+
+
+def make_quad() -> Mesh:
+    return Mesh([
+        Vertex((-1, -1, -1, 1), uv=(0, 0)),
+        Vertex((-1, 1, -1, 1), uv=(0, 1)),
+        Vertex((1, 1, -1, 1), uv=(1, 1)),
+        Vertex((1, -1, -1, 1), uv=(1, 0))
+    ], [0, 2, 1, 0, 3, 2])
