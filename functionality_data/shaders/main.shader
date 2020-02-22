@@ -8,12 +8,13 @@ shaders:
         layout (location = 2) in vec2 in_UV;
         layout (location = 3) in vec4 in_Color;
 
+        uniform mat4 ModelMatrix;
         uniform mat4 ViewMatrix;
         uniform mat4 ProjectionMatrix;
 
         void main()
         {
-            gl_Position = ProjectionMatrix * ViewMatrix * vec4(in_Pos, 1.0);
+            gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(in_Pos, 1.0);
         }
     fragment: |
         #version 330 core

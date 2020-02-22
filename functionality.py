@@ -10,6 +10,8 @@ from rosmarus.graphics.mesh import Mesh
 from rosmarus.graphics.shader import Shader
 from rosmarus import resources
 from rosmarus.io import shader_handler
+from rosmarus.math import transform
+from rosmarus.graphics.camera import Camera
 
 QUAD_VERTS = [
     Vertex((0, 0, -1, 1)),
@@ -30,9 +32,12 @@ def main():
             "shader", "functionality_data/shaders/main.shader")
 
         shader.bind()
-        view_m = glm.lookAt(glm.vec3(0, 0, 0), glm.vec3(0, 0, -1),
-                            glm.vec3(0, 1, 0))
-        shader.set_mat4("ViewMatrix", view_m)
+        t = transform.Transform2D()
+        t.translate((-1, 0))
+
+        cam = Camera()
+        cam.transform.translate(glm.vec3(0, 0, 1))
+        shader.set_mat4("ViewMatrix", cam.view_matrix())
 
         proj_m = glm.perspective(glm.radians(90), 800 / 600, 0.01, 100)
         shader.set_mat4("ProjectionMatrix", proj_m)
@@ -41,6 +46,8 @@ def main():
             GL.glClearColor(1, 0, 0, 1)
             GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
+            t.rotate(0.001, False)
+            shader.set_mat4("ModelMatrix", t.matrix())
             mesh.render()
 
             glfw.swap_buffers(window.glfw_window)
