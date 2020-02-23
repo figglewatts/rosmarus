@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 yapf = "*"
 pylint = "*"
+pyinstaller = "*"
 
 [packages]
 rosmarus = {editable = true,path = "."}
@@ -16,6 +17,7 @@ pyglm = "*"
 pyyaml = "*"
 pillow = "*"
 numpy = "*"
+marshmallow = "*"
 
 [requires]
 python_version = "3.7"

@@ -14,7 +14,7 @@ def load_texture(file_path: str) -> Texture2D:
         raise RuntimeError("Only PNG files are supported")
 
     with open(file_path, "rb") as image_file:
-        img = Image.open(image_file)
+        img = Image.open(image_file).transpose(Image.FLIP_TOP_BOTTOM)
         w, h = img.size
         img_data = array.array("B")
         for v in img.getdata():

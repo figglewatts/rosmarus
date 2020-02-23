@@ -15,22 +15,23 @@ from rosmarus.math import transform
 from rosmarus.graphics.camera import Camera
 from rosmarus.graphics.upscale_surface import UpscaleSurface
 from rosmarus.graphics.texture import Texture2D
+from rosmarus.application import Application
+import rosmarus.log
 
 
 def main():
-    ctx = GLContext(4, 3)
-    with Window("Rosmarus", 800, 600, ctx) as window:
+    app = Application("Rosmarus test")
+    rosmarus.log.init(app)
+    with app.make_window(800, 600, (4, 3)) as window:
         m = mesh.make_quad()
         t = transform.Transform2D()
-        shader: Shader = resources.load(
-            "shader", "functionality_data/shaders/main.shader")
+        shader: Shader = resources.load("shader", "shaders/main.shader")
 
         shader.bind()
         t.translate((80, 80))
         t.set_scale(glm.vec2(32, 32))
 
-        tex: Texture2D = resources.load(
-            "texture", "functionality_data/textures/dat_boi.png")
+        tex: Texture2D = resources.load("texture", "textures/dat_boi.png")
 
         cam = Camera()
         cam.transform.translate(glm.vec3(0, 0, 1))
