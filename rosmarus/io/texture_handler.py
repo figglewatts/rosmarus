@@ -1,3 +1,4 @@
+import array
 from ctypes import c_ubyte
 from os import path
 
@@ -13,12 +14,12 @@ def load_texture(file_path: str) -> Texture2D:
         raise RuntimeError("Only PNG files are supported")
 
     with open(file_path, "rb") as image_file:
-        img = Image.open(image_file).convert("RGBA")
+        img = Image.open(image_file)
         w, h = img.size
-        img_data = []
+        img_data = array.array("B")
         for v in img.getdata():
             img_data.extend(v)
-        raw_img_data = (c_ubyte * len(img_data))(*img_data)
+        raw_img_data = (c_ubyte * len(img_data)).from_buffer(img_data)
         return Texture2D(w, h, raw_img_data)
 
 
