@@ -4,6 +4,7 @@ import glfw
 from OpenGL import GL
 
 from .gl_context import GLContext
+from . import color
 
 
 class Window:
@@ -42,7 +43,16 @@ class Window:
         GL.glEnable(GL.GL_DEPTH_TEST)
         GL.glUseProgram(0)
 
+        self.set_clear_color(color.BLACK)
+
         return self
+
+    def set_clear_color(self, col: color.Color) -> None:
+        self.clear_color = col
+        GL.glClearColor(col.r, col.g, col.b, col.a)
+
+    def clear(self) -> None:
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
     def _cleanup(self) -> None:
         glfw.terminate()

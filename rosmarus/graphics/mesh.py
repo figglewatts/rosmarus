@@ -1,15 +1,33 @@
 from ctypes import *
-from typing import List
+from typing import List, Tuple
 
 from OpenGL import GL
+import glm
 
 from .vertex import Vertex
 
 
 class Mesh:
-    def __init__(self, verts: List[Vertex], indices: List[int]) -> None:
+    def __init__(self,
+                 verts: List[Vertex],
+                 indices: List[int],
+                 usage: GL.GLenum = GL.GL_STATIC_DRAW) -> None:
         self.has_data = False
+        self.usage = usage
         self.set_data(verts, indices)
+
+    def get_data(self) -> Tuple[POINTER(Vertex), POINTER(c_uint32)]:
+        return self.vertices, self.indices
+
+    def reupload_data(self) -> None:
+        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vbo)
+        GL.glBufferSubData(GL.GL_ARRAY_BUFFER, 0, sizeof(self.vertices),
+                           byref(self.vertices))
+        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, 0)
+        GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, self.ebo)
+        GL.glBufferSubData(GL.GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(self.indices),
+                           byref(self.indices))
+        GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, 0)
 
     def set_data(self, verts: List[Vertex], indices: List[int]) -> None:
         if self.has_data:
@@ -26,11 +44,11 @@ class Mesh:
 
         GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vbo)
         GL.glBufferData(GL.GL_ARRAY_BUFFER, sizeof(self.vertices),
-                        byref(self.vertices), GL.GL_STATIC_DRAW)
+                        byref(self.vertices), self.usage)
 
         GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, self.ebo)
         GL.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, sizeof(self.indices),
-                        byref(self.indices), GL.GL_STATIC_DRAW)
+                        byref(self.indices), self.usage)
 
         # position
         GL.glEnableVertexAttribArray(0)
@@ -63,10 +81,11 @@ class Mesh:
     def unbind(self) -> None:
         GL.glBindVertexArray(0)
 
-    def render(self) -> None:
+    def render(self, elements: int = -1) -> None:
         self.bind()
-        GL.glDrawElements(GL.GL_TRIANGLES, len(self.indices),
-                          GL.GL_UNSIGNED_INT, None)
+        if elements == -1:
+            elements = len(self.indices)
+        GL.glDrawElements(GL.GL_TRIANGLES, elements, GL.GL_UNSIGNED_INT, None)
         self.unbind()
 
     def cleanup(self) -> None:
@@ -75,10 +94,10 @@ class Mesh:
         GL.glDeleteVertexArrays(1, self.vao)
 
 
-def make_quad() -> Mesh:
+def make_quad(scale: int = 1) -> Mesh:
     return Mesh([
-        Vertex((-1, -1, -1, 1), uv=(0, 0)),
-        Vertex((-1, 1, -1, 1), uv=(0, 1)),
-        Vertex((1, 1, -1, 1), uv=(1, 1)),
-        Vertex((1, -1, -1, 1), uv=(1, 0))
+        Vertex(glm.vec4(-1 * scale, -1 * scale, -1, 1), uv=glm.vec2(0, 0)),
+        Vertex(glm.vec4(-1 * scale, 1 * scale, -1, 1), uv=glm.vec2(0, 1)),
+        Vertex(glm.vec4(1 * scale, 1 * scale, -1, 1), uv=glm.vec2(1, 1)),
+        Vertex(glm.vec4(1 * scale, -1 * scale, -1, 1), uv=glm.vec2(1, 0))
     ], [0, 2, 1, 0, 3, 2])

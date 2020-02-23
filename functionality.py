@@ -16,6 +16,7 @@ from rosmarus.graphics.camera import Camera
 from rosmarus.graphics.upscale_surface import UpscaleSurface
 from rosmarus.graphics.texture import Texture2D
 from rosmarus.application import Application
+from rosmarus.render.spritebatch import SpriteBatch
 import rosmarus.log
 
 
@@ -23,44 +24,34 @@ def main():
     app = Application("Rosmarus test")
     rosmarus.log.init(app)
     with app.make_window(800, 600, (4, 3)) as window:
-        m = mesh.make_quad()
-        t = transform.Transform2D()
-        shader: Shader = resources.load("shader", "shaders/main.shader")
-
-        shader.bind()
-        t.translate((80, 80))
-        t.set_scale(glm.vec2(32, 32))
-
         tex: Texture2D = resources.load("texture", "textures/dat_boi.png")
 
         cam = Camera()
         cam.transform.translate(glm.vec3(0, 0, 1))
-        shader.set_mat4("ViewMatrix", cam.view_matrix())
 
         proj_m = glm.ortho(0, window.width, 0, window.height, 0.01, 100)
-        shader.set_mat4("ProjectionMatrix", proj_m)
-        shader.unbind()
+
+        sb = SpriteBatch(projection_matrix=proj_m)
+        sb.set_camera(cam)
 
         uss = UpscaleSurface(window.width / 4, window.height / 4)
 
-        GL.glClearColor(1, 0, 0, 1)
-
-        while not glfw.window_should_close(window.glfw_window):
+        def render() -> None:
             uss.begin()
-            GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
-            shader.bind()
-            tex.bind()
-            t.rotate(0.001, False)
-            shader.set_mat4("ModelMatrix", t.matrix())
-            m.render()
-            tex.unbind()
-            shader.unbind()
+            window.clear()
+            sb.begin()
+            sb.draw(tex, 128, 128, width=32, height=32)
+            sb.draw(tex, 64, 128, width=32, height=32)
+            sb.draw(tex, 32, 32, width=32, height=32)
+            sb.draw(tex, 0, 128, width=32, height=32)
+            sb.end()
             uss.end()
 
             uss.render()
 
-            glfw.swap_buffers(window.glfw_window)
-            glfw.poll_events()
+        app.set_render_callback(render)
+
+        app.main_loop(window)
 
 
 if __name__ == "__main__":

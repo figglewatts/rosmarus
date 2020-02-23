@@ -1,3 +1,4 @@
+from __future__ import annotations
 from ctypes import c_void_p
 from typing import Tuple
 
@@ -71,3 +72,8 @@ class Texture2D:
 
     def get_handle(self) -> GL.GLuint:
         return self._handle
+
+    def __eq__(self, other: Texture2D) -> bool:
+        if isinstance(other, Texture2D):
+            return self._handle == other._handle
+        return False

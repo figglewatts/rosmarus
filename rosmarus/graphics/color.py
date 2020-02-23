@@ -1,3 +1,6 @@
+import glm
+
+
 class Color:
     def __init__(self,
                  r: float = 1,
@@ -11,6 +14,12 @@ class Color:
 
     def __repr__(self) -> str:
         return f"Color({self.r}, {self.g}, {self.b}, {self.a})"
+
+    def to_vec4(self) -> glm.vec4:
+        return glm.vec4(self.r, self.g, self.b, self.a)
+
+    def to_tuple(self):
+        return (self.r, self.g, self.b, self.a)
 
 
 WHITE = Color()
