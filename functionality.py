@@ -15,6 +15,7 @@ from rosmarus.math import transform
 from rosmarus.graphics.camera import Camera
 from rosmarus.graphics.upscale_surface import UpscaleSurface
 from rosmarus.graphics.texture import Texture2D
+from rosmarus.graphics import color
 from rosmarus.application import Application
 from rosmarus.render.spritebatch import SpriteBatch
 import rosmarus.log
@@ -25,6 +26,8 @@ def main():
     rosmarus.log.init(app)
     with app.make_window(800, 600, (4, 3)) as window:
         tex: Texture2D = resources.load("texture", "textures/dat_boi.png")
+
+        window.set_clear_color(color.BLUE)
 
         cam = Camera()
         cam.transform.translate(glm.vec3(0, 0, 1))
@@ -40,7 +43,7 @@ def main():
             uss.begin()
             window.clear()
             sb.begin()
-            sb.draw(tex, 128, 128, width=32, height=32)
+            sb.draw(tex, 128, 128, width=32, height=32, tint=color.RED)
             sb.draw(tex, 64, 128, width=32, height=32)
             sb.draw(tex, 32, 32, width=32, height=32)
             sb.draw(tex, 0, 128, width=32, height=32)

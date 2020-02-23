@@ -43,9 +43,25 @@ in vec4 VertexColor;
 uniform sampler2D Tex;
 uniform vec4 TintColor;
 
+vec3 blend_overlay(vec3 base, vec3 blend) {
+    return mix(1.0 - 2.0 * (1.0 - base) * (1.0 - blend), 2.0 * base * blend, step(base, vec3(0.5)));
+}
+
+vec3 blend_hard_light(vec3 base, vec3 blend) {
+    float brightness = (0.299*base.r + 0.587*base.g + 0.114*base.b);
+    brightness = 1.0 - brightness;
+	return (blend_overlay(base, blend) * brightness + base * (1.0 - brightness));
+}
+
+vec3 blend_col(in vec3 base, in vec3 blend) {
+    float brightness = (0.299*base.r + 0.587*base.g + 0.114*base.b);
+    return mix(base, blend, brightness);
+}
+
 void main()
 {
-    out_FragColor = texture(Tex, TexCoords) * TintColor * VertexColor;
+    vec4 col = texture(Tex, TexCoords) * TintColor;
+    out_FragColor = vec4(blend_col(col.rgb, VertexColor.rgb), col.a);
 }
 """
 
@@ -152,13 +168,13 @@ class SpriteBatch:
 
         trans = Transform2D()
 
+        trans.set_position((x_pos, y_pos))
+
         if rotation != 0:
-            trans.rotate(rotation, False)
+            trans.set_orientation(rotation)
 
         if scale_x != 1 or scale_y != 1:
             trans.set_scale((scale_x, scale_y))
-
-        trans.set_position((x_pos, y_pos))
 
         tint_col = tint.to_vec4()
 

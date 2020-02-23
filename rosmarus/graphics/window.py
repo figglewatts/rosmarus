@@ -38,6 +38,7 @@ class Window:
         GL.glEnable(GL.GL_CULL_FACE)
         GL.glFrontFace(GL.GL_CCW)
         GL.glCullFace(GL.GL_BACK)
+        GL.glEnable(GL.GL_BLEND)
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
         GL.glBlendEquation(GL.GL_FUNC_ADD)
         GL.glEnable(GL.GL_DEPTH_TEST)

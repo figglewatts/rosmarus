@@ -12,12 +12,12 @@ from ..math.transform import Transform
 
 
 class Renderable:
-    def __init__(
-            self,
-            mesh: Mesh,
-            shader: Shader,
-            texture: Texture2D,
-            transform: Transform = Transform()) -> None:
+    def __init__(self,
+                 mesh: Mesh,
+                 shader: Shader,
+                 texture: Texture2D,
+                 transform: Transform = Transform(),
+                 transparent: bool = False) -> None:
         self.mesh = mesh
         self.shader = shader
         self.texture = texture
@@ -25,6 +25,7 @@ class Renderable:
         self.tint = color.WHITE
         self.id = uuid.uuid4()
         self.active = True
+        self.transparent = transparent
 
     def set_active(self, state: bool) -> None:
         self.active = state
