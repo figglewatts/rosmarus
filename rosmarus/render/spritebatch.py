@@ -141,14 +141,15 @@ class SpriteBatch:
 
     def draw(self,
              tex: Texture2D,
-             x_pos: int,
-             y_pos: int,
+             x_pos: int = 0,
+             y_pos: int = 0,
              scale_x: int = 1,
              scale_y: int = 1,
              width: int = -1,
              height: int = -1,
              rotation: float = 0,
-             tint: color.Color = color.WHITE) -> None:
+             tint: color.Color = color.WHITE,
+             transform: Transform2D = None) -> None:
         if tex != self.renderable.texture:
             self._switch_texture(tex)
 
@@ -166,29 +167,27 @@ class SpriteBatch:
         x, y = -(width / 2), -(height / 2)
         x2, y2 = x + width, y + height
 
-        trans = Transform2D()
-
-        trans.set_position((x_pos, y_pos))
-
-        if rotation != 0:
-            trans.set_orientation(rotation)
-
-        if scale_x != 1 or scale_y != 1:
-            trans.set_scale((scale_x, scale_y))
+        if transform is None:
+            transform = Transform2D()
+            transform.set_position((x_pos, y_pos))
+            if rotation != 0:
+                transform.set_orientation(rotation)
+            if scale_x != 1 or scale_y != 1:
+                transform.set_scale((scale_x, scale_y))
 
         tint_col = tint.to_vec4()
 
         # create the vertices
-        v0 = Vertex(trans.matrix() * glm.vec4(x, y, -1, 1),
+        v0 = Vertex(transform.matrix() * glm.vec4(x, y, -1, 1),
                     uv=glm.vec2(u, v),
                     color=tint_col)
-        v1 = Vertex(trans.matrix() * glm.vec4(x, y2, -1, 1),
+        v1 = Vertex(transform.matrix() * glm.vec4(x, y2, -1, 1),
                     uv=glm.vec2(u, v2),
                     color=tint_col)
-        v2 = Vertex(trans.matrix() * glm.vec4(x2, y2, -1, 1),
+        v2 = Vertex(transform.matrix() * glm.vec4(x2, y2, -1, 1),
                     uv=glm.vec2(u2, v2),
                     color=tint_col)
-        v3 = Vertex(trans.matrix() * glm.vec4(x2, y, -1, 1),
+        v3 = Vertex(transform.matrix() * glm.vec4(x2, y, -1, 1),
                     uv=glm.vec2(u2, v),
                     color=tint_col)
 

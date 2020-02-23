@@ -18,6 +18,7 @@ from rosmarus.graphics.texture import Texture2D
 from rosmarus.graphics import color
 from rosmarus.application import Application
 from rosmarus.render.spritebatch import SpriteBatch
+from rosmarus.render.sprite import Sprite
 import rosmarus.log
 
 
@@ -26,6 +27,11 @@ def main():
     rosmarus.log.init(app)
     with app.make_window(800, 600, (4, 3)) as window:
         tex: Texture2D = resources.load("texture", "textures/dat_boi.png")
+        trans = transform.Transform2D()
+        spr = Sprite(tex, trans)
+        trans.translate((50, 50))
+        trans.rotate(0.5, False)
+        trans.rescale((2, 2))
 
         window.set_clear_color(color.BLUE)
 
@@ -43,10 +49,7 @@ def main():
             uss.begin()
             window.clear()
             sb.begin()
-            sb.draw(tex, 128, 128, width=32, height=32, tint=color.RED)
-            sb.draw(tex, 64, 128, width=32, height=32)
-            sb.draw(tex, 32, 32, width=32, height=32)
-            sb.draw(tex, 0, 128, width=32, height=32)
+            spr.draw(sb, width=32, height=32)
             sb.end()
             uss.end()
 
