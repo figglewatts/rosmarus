@@ -11,6 +11,7 @@ from .renderable import Renderable
 from ..math.transform import Transform2D
 from ..graphics.texture import Texture2D
 from ..graphics import color
+from ..math.rect import Rect
 
 _SB_VERTEX_SHADER = """#version 330 core
 
@@ -43,25 +44,9 @@ in vec4 VertexColor;
 uniform sampler2D Tex;
 uniform vec4 TintColor;
 
-vec3 blend_overlay(vec3 base, vec3 blend) {
-    return mix(1.0 - 2.0 * (1.0 - base) * (1.0 - blend), 2.0 * base * blend, step(base, vec3(0.5)));
-}
-
-vec3 blend_hard_light(vec3 base, vec3 blend) {
-    float brightness = (0.299*base.r + 0.587*base.g + 0.114*base.b);
-    brightness = 1.0 - brightness;
-	return (blend_overlay(base, blend) * brightness + base * (1.0 - brightness));
-}
-
-vec3 blend_col(in vec3 base, in vec3 blend) {
-    float brightness = (0.299*base.r + 0.587*base.g + 0.114*base.b);
-    return mix(base, blend, brightness);
-}
-
 void main()
 {
-    vec4 col = texture(Tex, TexCoords) * TintColor;
-    out_FragColor = vec4(blend_col(col.rgb, VertexColor.rgb), col.a);
+    out_FragColor = texture(Tex, TexCoords) * TintColor * VertexColor;
 }
 """
 
@@ -149,12 +134,16 @@ class SpriteBatch:
              height: int = -1,
              rotation: float = 0,
              tint: color.Color = color.WHITE,
-             transform: Transform2D = None) -> None:
+             transform: Transform2D = None,
+             tex_region: Rect = None) -> None:
         if tex != self.renderable.texture:
             self._switch_texture(tex)
 
         if self.vertices_drawn + 4 > self.length:
             self.flush()
+
+        u, v = (0, 0)
+        u2, v2 = (1, 1)
 
         t_width, t_height = tex.get_size()
         if width == -1:
@@ -162,8 +151,12 @@ class SpriteBatch:
         if height == -1:
             height = t_height
 
-        u, v = (0, 0)
-        u2, v2 = (1, 1)
+        if tex_region is not None:
+            u, v2, u2, v = tex.region_to_uvs(tex_region).get_extent_tuple()
+            v = 1 - v
+            v2 = 1 - v2
+            width, height = tex_region.get_size()
+
         x, y = -(width / 2), -(height / 2)
         x2, y2 = x + width, y + height
 

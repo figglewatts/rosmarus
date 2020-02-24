@@ -19,6 +19,7 @@ from rosmarus.graphics import color
 from rosmarus.application import Application
 from rosmarus.render.spritebatch import SpriteBatch
 from rosmarus.render.sprite import Sprite
+from rosmarus.render.spritesheet import SpriteSheet
 import rosmarus.log
 
 
@@ -26,12 +27,10 @@ def main():
     app = Application("Rosmarus test")
     rosmarus.log.init(app)
     with app.make_window(800, 600, (4, 3)) as window:
-        tex: Texture2D = resources.load("texture", "textures/dat_boi.png")
-        trans = transform.Transform2D()
-        spr = Sprite(tex, trans)
-        trans.translate((50, 50))
-        trans.rotate(0.5, False)
-        trans.rescale((2, 2))
+        poke_tex: Texture2D = resources.load("texture",
+                                             "textures/pokemon.png",
+                                             mipmap=None)
+        sprsh = SpriteSheet(poke_tex, 16, 16)
 
         window.set_clear_color(color.BLUE)
 
@@ -49,7 +48,10 @@ def main():
             uss.begin()
             window.clear()
             sb.begin()
-            spr.draw(sb, width=32, height=32)
+
+            for i in range(0, 16):
+                sprsh.get_sprite(i, x_pos=i * 20, y_pos=32).draw(sb)
+
             sb.end()
             uss.end()
 

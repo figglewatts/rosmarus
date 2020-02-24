@@ -4,6 +4,8 @@ from typing import Tuple
 
 from OpenGL import GL
 
+from ..math.rect import Rect
+
 
 class Texture2D:
     def __init__(self,
@@ -60,6 +62,13 @@ class Texture2D:
         if self._mipmap:
             GL.glGenerateMipmap(GL.GL_TEXTURE_2D)
         self.unbind()
+
+    def region_to_uvs(self, region: Rect) -> Rect:
+        u = region.x / self._width
+        v = region.y / self._height
+        u2 = region.x2 / self._width
+        v2 = region.y2 / self._height
+        return Rect(u, v, u2 - u, v2 - v)
 
     def bind(self) -> None:
         GL.glBindTexture(GL.GL_TEXTURE_2D, self._handle)

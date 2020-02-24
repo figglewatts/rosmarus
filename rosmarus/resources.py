@@ -44,11 +44,8 @@ def load(resource_type: str,
     if cached_resource is not None:
         return cached_resource.value
 
-    loaded_resource = _resource_handlers[resource_type](path)
-    _resource_cache[path] = resource(loaded=loaded_resource,
-                                     lifespan=lifespan,
-                                     *args,
-                                     **kwargs)
+    loaded_resource = _resource_handlers[resource_type](path, *args, **kwargs)
+    _resource_cache[path] = resource(loaded=loaded_resource, lifespan=lifespan)
     return loaded_resource
 
 
