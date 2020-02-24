@@ -4,6 +4,7 @@ from typing import List, Tuple
 from OpenGL import GL
 
 from .texture import Texture2D
+from .window import Window
 
 
 class Framebuffer:
@@ -84,9 +85,12 @@ class Framebuffer:
         return self._depth_attachment
 
     def bind(self) -> None:
+        self._cached_viewport = Window.viewport
+        Window.set_viewport(0, 0, self._width, self._height)
         GL.glBindFramebuffer(self._type, self._handle)
 
     def unbind(self) -> None:
+        Window.set_viewport(*self._cached_viewport.get_tuple())
         GL.glBindFramebuffer(self._type, 0)
 
     def resize(self, width: int, height: int) -> None:

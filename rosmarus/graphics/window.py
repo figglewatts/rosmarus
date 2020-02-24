@@ -1,19 +1,30 @@
 from __future__ import annotations
+from typing import Callable
 
 import glfw
 from OpenGL import GL
 
 from .gl_context import GLContext
 from . import color
+from ..math.rect import Rect
 
 
 class Window:
-    def __init__(self, title: str, width: int, height: int,
-                 gl_context: GLContext) -> None:
+    viewport = Rect()
+
+    def __init__(self,
+                 title: str,
+                 width: int,
+                 height: int,
+                 gl_context: GLContext,
+                 on_resize: Callable[..., None] = None) -> None:
         self.title = title
         self.width = width
         self.height = height
         self.gl_context = gl_context
+        self.on_resize = on_resize
+        self.initialized = False
+        Window.viewport = Rect(0, 0, width, height)
 
     def __enter__(self) -> Window:
         return self._initialize()
@@ -44,13 +55,27 @@ class Window:
         GL.glEnable(GL.GL_DEPTH_TEST)
         GL.glUseProgram(0)
 
+        glfw.set_window_size_callback(self.glfw_window, self.on_resize)
+
         self.set_clear_color(color.BLACK)
 
+        self.initialized = True
+
         return self
+
+    def set_resize_callback(self, callback: Callable[..., None]) -> None:
+        self.on_resize = callback
+        if self.initialized:
+            glfw.set_window_size_callback(self.glfw_window, self.on_resize)
 
     def set_clear_color(self, col: color.Color) -> None:
         self.clear_color = col
         GL.glClearColor(col.r, col.g, col.b, col.a)
+
+    @staticmethod
+    def set_viewport(x: int, y: int, w: int, h: int) -> None:
+        GL.glViewport(int(x), int(y), int(w), int(h))
+        Window.viewport = Rect(x, y, w, h)
 
     def clear(self) -> None:
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)

@@ -4,7 +4,11 @@ import glm
 
 
 class Rect:
-    def __init__(self, x: float, y: float, w: float, h: float) -> None:
+    def __init__(self,
+                 x: float = 0,
+                 y: float = 0,
+                 w: float = 0,
+                 h: float = 0) -> None:
         self.x = x
         self.y = y
         self.w = w

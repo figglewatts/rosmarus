@@ -54,14 +54,37 @@ class TestScene(scene.Scene):
         pass
 
 
+TARGET_WIDTH = 200
+TARGET_HEIGHT = 150
+
+
 def main():
     app = Application("Rosmarus test")
     rosmarus.log.init(app)
-    with app.make_window(800, 600, (4, 3)) as window:
-        window.set_clear_color(color.BLUE)
-        uss = UpscaleSurface(window.width / 4, window.height / 4)
+    with app.make_window(TARGET_WIDTH * 4, TARGET_HEIGHT * 4,
+                         (4, 3)) as window:
+        window.set_clear_color(color.BLACK)
+        uss = UpscaleSurface(TARGET_WIDTH, TARGET_HEIGHT)
 
         app.scene_manager.add_scene(TestScene(window, "test", active=True))
+
+        def resize(win, w, h) -> None:
+            window.clear()
+            target_aspect = float(TARGET_WIDTH) / float(TARGET_HEIGHT)
+
+            width = w
+            height = int(width / target_aspect + 0.5)
+            if height > h:
+                height = h
+                width = int(height * target_aspect + 0.5)
+
+            x_pos = (w / 2) - (width / 2)
+            y_pos = (h / 2) - (height / 2)
+
+            print(x_pos, y_pos)
+            print(width, height)
+
+            window.set_viewport(x_pos, y_pos, width, height)
 
         def render() -> None:
             uss.begin()
@@ -76,6 +99,7 @@ def main():
 
         app.set_render_callback(render)
         app.set_update_callback(update)
+        window.set_resize_callback(resize)
 
         app.main_loop(window)
 
