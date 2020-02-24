@@ -4,6 +4,7 @@ import uuid
 import glm
 from OpenGL import GL
 
+from ..graphics.camera import Camera
 from ..graphics.mesh import Mesh
 from ..graphics.shader import Shader
 from ..graphics.texture import Texture2D
@@ -33,10 +34,7 @@ class Renderable:
     def set_tint(self, col: color.Color) -> None:
         self.tint = col
 
-    def draw(self,
-             view_matrix: glm.mat4,
-             proj_matrix: glm.mat4,
-             elements: int = -1) -> None:
+    def draw(self, camera: Camera, elements: int = -1) -> None:
         if not self.active:
             return
 
@@ -46,8 +44,8 @@ class Renderable:
 
         self.shader.bind()
         self.shader.set_mat4("ModelMatrix", self.transform.matrix())
-        self.shader.set_mat4("ViewMatrix", view_matrix)
-        self.shader.set_mat4("ProjectionMatrix", proj_matrix)
+        self.shader.set_mat4("ViewMatrix", camera.view_matrix())
+        self.shader.set_mat4("ProjectionMatrix", camera.projection)
         self.shader.set_vec4("TintColor", self.tint.to_vec4())
         self.texture.bind()
         self.mesh.render(elements)

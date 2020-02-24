@@ -7,6 +7,7 @@ from .graphics.window import Window
 from .graphics.gl_context import GLContext
 from .util import make_path_safe
 from . import resources
+from . import scene
 
 
 class Application:
@@ -28,6 +29,7 @@ class Application:
         self.on_render = on_render
         self.target_delta_time = 1.0 / update_frequency_hz
         self.elapsed_time = 0
+        self.scene_manager = scene.SceneManager()
         resources._register_data_path(data_path)
 
     def set_start_callback(self, callback: Callable[..., None]) -> None:

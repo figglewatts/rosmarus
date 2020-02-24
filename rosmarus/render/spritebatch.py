@@ -54,7 +54,7 @@ void main()
 class SpriteBatch:
     def __init__(
             self,
-            projection_matrix: glm.mat4,
+            camera: Camera,
             size: int = 1024,
             transform: Transform2D = Transform2D()) -> None:
         self.size = size
@@ -71,8 +71,7 @@ class SpriteBatch:
             }), transform)
         self.vertices, self.indices = self.renderable.mesh.get_data()
 
-        self.camera = None
-        self.projection_matrix = projection_matrix
+        self.camera = camera
 
         self.drawing = False
         self.render_calls = 0
@@ -116,10 +115,8 @@ class SpriteBatch:
         self.renderable.mesh.reupload_data()
 
         sprite_count = self.vertices_drawn / 4  # 4 verts per sprite
-        self.renderable.draw(self.camera.view_matrix(),
-                             self.projection_matrix,
-                             elements=int(sprite_count *
-                                          6))  # 6 indices per sprite
+        self.renderable.draw(self.camera, elements=int(
+            sprite_count * 6))  # 6 indices per sprite
 
         self.vertices_drawn = 0
         self.indices_drawn = 0

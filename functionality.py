@@ -20,44 +20,62 @@ from rosmarus.application import Application
 from rosmarus.render.spritebatch import SpriteBatch
 from rosmarus.render.sprite import Sprite
 from rosmarus.render.spritesheet import SpriteSheet
+from rosmarus import scene
 import rosmarus.log
+
+
+class TestScene(scene.Scene):
+    def on_active(self):
+        pass
+
+    def init(self):
+        self.poke_tex: Texture2D = resources.load("texture",
+                                                  "textures/pokemon.png",
+                                                  mipmap=None)
+        self.sprsh = SpriteSheet(self.poke_tex, 16, 16)
+        self.cam = Camera(
+            glm.ortho(0, self.window.width, 0, self.window.height, 0.01, 100))
+        self.cam.transform.translate(glm.vec3(0, 0, 1))
+        self.sb = SpriteBatch(self.cam)
+        self.spr_count_x, _ = self.sprsh.get_size_in_sprites()
+
+    def render(self, *args, **kwargs):
+        self.sb.begin()
+
+        for y in range(0, 16):
+            for x in range(0, 16):
+                idx = y * self.spr_count_x + x
+                self.sprsh.get_sprite(idx, x_pos=x * 20 + 8,
+                                      y_pos=y * 20 + 8).draw(self.sb)
+
+        self.sb.end()
+
+    def update(self, delta_time, *args, **kwargs):
+        pass
 
 
 def main():
     app = Application("Rosmarus test")
     rosmarus.log.init(app)
     with app.make_window(800, 600, (4, 3)) as window:
-        poke_tex: Texture2D = resources.load("texture",
-                                             "textures/pokemon.png",
-                                             mipmap=None)
-        sprsh = SpriteSheet(poke_tex, 16, 16)
-
         window.set_clear_color(color.BLUE)
-
-        cam = Camera()
-        cam.transform.translate(glm.vec3(0, 0, 1))
-
-        proj_m = glm.ortho(0, window.width, 0, window.height, 0.01, 100)
-
-        sb = SpriteBatch(projection_matrix=proj_m)
-        sb.set_camera(cam)
-
         uss = UpscaleSurface(window.width / 4, window.height / 4)
+
+        app.scene_manager.add_scene(TestScene(window, "test", active=True))
 
         def render() -> None:
             uss.begin()
             window.clear()
-            sb.begin()
-
-            for i in range(0, 16):
-                sprsh.get_sprite(i, x_pos=i * 20, y_pos=32).draw(sb)
-
-            sb.end()
+            app.scene_manager.render()
             uss.end()
 
             uss.render()
 
+        def update(delta_time: float) -> None:
+            app.scene_manager.update(delta_time)
+
         app.set_render_callback(render)
+        app.set_update_callback(update)
 
         app.main_loop(window)
 
