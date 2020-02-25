@@ -10,8 +10,6 @@ from ..math.rect import Rect
 
 
 class Window:
-    viewport = Rect()
-
     def __init__(self,
                  title: str,
                  width: int,
@@ -24,7 +22,6 @@ class Window:
         self.gl_context = gl_context
         self.on_resize = on_resize
         self.initialized = False
-        Window.viewport = Rect(0, 0, width, height)
 
     def __enter__(self) -> Window:
         return self._initialize()
@@ -72,13 +69,13 @@ class Window:
         self.clear_color = col
         GL.glClearColor(col.r, col.g, col.b, col.a)
 
-    @staticmethod
-    def set_viewport(x: int, y: int, w: int, h: int) -> None:
-        GL.glViewport(int(x), int(y), int(w), int(h))
-        Window.viewport = Rect(x, y, w, h)
-
-    def clear(self) -> None:
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+    def clear(self, col: color.Color = None) -> None:
+        if col is None:
+            GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+        else:
+            GL.glClearColor(col.r, col.g, col.b, col.a)
+            GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+            self.set_clear_color(self.clear_color)
 
     def _cleanup(self) -> None:
         glfw.terminate()

@@ -20,6 +20,7 @@ from rosmarus.application import Application
 from rosmarus.render.spritebatch import SpriteBatch
 from rosmarus.render.sprite import Sprite
 from rosmarus.render.spritesheet import SpriteSheet
+from rosmarus.graphics.viewport import ConstantViewport
 from rosmarus import scene
 import rosmarus.log
 
@@ -34,7 +35,7 @@ class TestScene(scene.Scene):
                                                   mipmap=None)
         self.sprsh = SpriteSheet(self.poke_tex, 16, 16)
         self.cam = Camera(
-            glm.ortho(0, self.window.width, 0, self.window.height, 0.01, 100))
+            glm.ortho(0, TARGET_WIDTH, 0, TARGET_HEIGHT, 0.01, 100))
         self.cam.transform.translate(glm.vec3(0, 0, 1))
         self.sb = SpriteBatch(self.cam)
         self.spr_count_x, _ = self.sprsh.get_size_in_sprites()
@@ -63,28 +64,14 @@ def main():
     rosmarus.log.init(app)
     with app.make_window(TARGET_WIDTH * 4, TARGET_HEIGHT * 4,
                          (4, 3)) as window:
-        window.set_clear_color(color.BLACK)
-        uss = UpscaleSurface(TARGET_WIDTH, TARGET_HEIGHT)
+        window.set_clear_color(color.RED)
+        viewport = ConstantViewport(window, TARGET_WIDTH, TARGET_HEIGHT)
+        uss = UpscaleSurface(TARGET_WIDTH, TARGET_HEIGHT, viewport)
 
         app.scene_manager.add_scene(TestScene(window, "test", active=True))
 
         def resize(win, w, h) -> None:
-            window.clear()
-            target_aspect = float(TARGET_WIDTH) / float(TARGET_HEIGHT)
-
-            width = w
-            height = int(width / target_aspect + 0.5)
-            if height > h:
-                height = h
-                width = int(height * target_aspect + 0.5)
-
-            x_pos = (w / 2) - (width / 2)
-            y_pos = (h / 2) - (height / 2)
-
-            print(x_pos, y_pos)
-            print(width, height)
-
-            window.set_viewport(x_pos, y_pos, width, height)
+            viewport.on_resize(w, h)
 
         def render() -> None:
             uss.begin()

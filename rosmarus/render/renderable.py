@@ -45,7 +45,7 @@ class Renderable:
         self.shader.bind()
         self.shader.set_mat4("ModelMatrix", self.transform.matrix())
         self.shader.set_mat4("ViewMatrix", camera.view_matrix())
-        self.shader.set_mat4("ProjectionMatrix", camera.projection)
+        self.shader.set_mat4("ProjectionMatrix", camera.get_projection())
         self.shader.set_vec4("TintColor", self.tint.to_vec4())
         self.texture.bind()
         self.mesh.render(elements)

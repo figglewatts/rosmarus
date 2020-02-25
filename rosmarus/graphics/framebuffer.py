@@ -5,6 +5,7 @@ from OpenGL import GL
 
 from .texture import Texture2D
 from .window import Window
+from .viewport import Viewport
 
 
 class Framebuffer:
@@ -12,6 +13,7 @@ class Framebuffer:
                  width: int,
                  height: int,
                  fb_type: GL.GLenum,
+                 viewport: Viewport,
                  color_attachments: List[Texture2D] = None,
                  depth_attachment: Texture2D = None) -> None:
         self._width = width
@@ -19,6 +21,7 @@ class Framebuffer:
         self._type = fb_type
         self._handle = GL.glGenFramebuffers(1)
         self._color_attachments = []
+        self._viewport = viewport
         if color_attachments is None:
             color_attachments = [Texture2D(width, height, mipmap=False)]
         for color_attachment in color_attachments:
@@ -85,12 +88,11 @@ class Framebuffer:
         return self._depth_attachment
 
     def bind(self) -> None:
-        self._cached_viewport = Window.viewport
-        Window.set_viewport(0, 0, self._width, self._height)
+        self._viewport.push_screen(0, 0, self._width, self._height)
         GL.glBindFramebuffer(self._type, self._handle)
 
     def unbind(self) -> None:
-        Window.set_viewport(*self._cached_viewport.get_tuple())
+        self._viewport.pop_screen()
         GL.glBindFramebuffer(self._type, 0)
 
     def resize(self, width: int, height: int) -> None:

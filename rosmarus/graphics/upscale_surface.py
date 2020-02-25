@@ -1,8 +1,12 @@
 from OpenGL import GL
+import glm
 
 from .framebuffer import Framebuffer
 from .shader import Shader
 from . import mesh
+from ..graphics.camera import Camera
+from ..graphics.window import Window
+from .viewport import Viewport
 
 _VERTEX_SHADER = """#version 330 core
 
@@ -34,12 +38,13 @@ void main()
 
 
 class UpscaleSurface:
-    def __init__(self, width: int, height: int) -> None:
+    def __init__(self, width: int, height: int, viewport: Viewport) -> None:
         self.shader = Shader("_upscalesurface", {
             "vertex": _VERTEX_SHADER,
             "fragment": _FRAGMENT_SHADER
         })
-        self.framebuffer = Framebuffer(width, height, GL.GL_FRAMEBUFFER)
+        self.framebuffer = Framebuffer(width, height, GL.GL_FRAMEBUFFER,
+                                       viewport)
         self.quad_mesh = mesh.make_quad()
 
     def begin(self) -> None:
@@ -50,7 +55,7 @@ class UpscaleSurface:
         self.framebuffer.unbind()
 
     def render(self) -> None:
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+        self.framebuffer._viewport.clear_viewport()
         GL.glDisable(GL.GL_DEPTH_TEST)
         self.shader.bind()
         self.framebuffer.get_texture(0).bind()

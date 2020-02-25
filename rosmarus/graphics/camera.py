@@ -13,3 +13,6 @@ class Camera:
             self.transform.get_position(),
             self.transform.get_position() + self.transform.forward(),
             self.transform.up())
+
+    def get_projection(self) -> glm.mat4:
+        return self.projection
