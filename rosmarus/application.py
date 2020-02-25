@@ -8,6 +8,7 @@ from .graphics.gl_context import GLContext
 from .util import make_path_safe
 from . import resources
 from . import scene
+from . import controls
 
 
 class Application:
@@ -50,6 +51,13 @@ class Application:
             callback(*args, **kwargs)
 
     def main_loop(self, window: Window) -> None:
+        glfw.set_key_callback(window.glfw_window, controls.key_callback)
+        glfw.set_cursor_pos_callback(window.glfw_window,
+                                     controls.cursor_pos_callback)
+        glfw.set_mouse_button_callback(window.glfw_window,
+                                       controls.mouse_button_callback)
+        glfw.set_scroll_callback(window.glfw_window, controls.scroll_callback)
+
         current_time = glfw.get_time()
         accumulator = 0
         while not glfw.window_should_close(window.glfw_window):

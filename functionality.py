@@ -23,6 +23,8 @@ from rosmarus.render.spritesheet import SpriteSheet
 from rosmarus.graphics.viewport import ConstantViewport
 from rosmarus import scene
 import rosmarus.log
+from rosmarus import controls
+from rosmarus.controls import InputState
 
 
 class TestScene(scene.Scene):
@@ -70,6 +72,8 @@ def main():
 
         app.scene_manager.add_scene(TestScene(window, "test", active=True))
 
+        controls.add("test", glfw.KEY_W)
+
         def resize(win, w, h) -> None:
             viewport.on_resize(w, h)
 
@@ -78,10 +82,14 @@ def main():
             window.clear()
             app.scene_manager.render()
             uss.end()
-
             uss.render()
 
         def update(delta_time: float) -> None:
+            controls.handle()
+
+            if controls.check("test", InputState.HELD):
+                print("DOWN")
+
             app.scene_manager.update(delta_time)
 
         app.set_render_callback(render)
