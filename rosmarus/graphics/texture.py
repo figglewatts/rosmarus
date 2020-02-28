@@ -1,5 +1,5 @@
 from __future__ import annotations
-from ctypes import c_void_p
+from ctypes import c_void_p, byref
 from typing import Tuple
 
 from OpenGL import GL
@@ -77,7 +77,7 @@ class Texture2D:
         GL.glBindTexture(GL.GL_TEXTURE_2D, 0)
 
     def cleanup(self) -> None:
-        GL.glDeleteTextures(1, self._handle)
+        GL.glDeleteTextures(1, GL.GLuint(self._handle))
 
     def get_handle(self) -> GL.GLuint:
         return self._handle

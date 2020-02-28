@@ -19,4 +19,8 @@ def load_shader(path: str) -> Shader:
         return Shader(name, shaders)
 
 
-resources.register_type_handler("shader", load_shader)
+def cleanup_shader(shader: Shader) -> Shader:
+    shader.cleanup()
+
+
+resources.register_type_handler("shader", load_shader, cleanup_shader)

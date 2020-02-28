@@ -4,20 +4,23 @@ from typing import Callable
 from os import path as os_path
 
 _resource_handlers = {}
+_resource_cleaner_uppers = {}
 _resource_cache = {}
 
-resource = namedtuple("resource", ["loaded", "lifespan"])
+resource = namedtuple("resource", ["loaded", "lifespan", "type"])
 
 _DATA_PATH = ""
 
 
 def register_type_handler(resource_type: str,
-                          loader: Callable[[str], object]) -> None:
+                          loader: Callable[[str], object],
+                          cleaner_upper: Callable = None) -> None:
     if resource_type in _resource_handlers:
         raise ValueError(
             f"Resource type handler '{resource_type}' already exists!")
 
     _resource_handlers[resource_type] = loader
+    _resource_cleaner_uppers[resource_type] = cleaner_upper
 
 
 def clear_lifespan(lifespan: str) -> None:
@@ -26,6 +29,7 @@ def clear_lifespan(lifespan: str) -> None:
 
     for k, r in _resource_cache.items():
         if r.lifespan == lifespan:
+            _cleanup_resource(_resource_cache[k])
             del _resource_cache[k]
 
 
@@ -45,8 +49,21 @@ def load(resource_type: str,
         return cached_resource.value
 
     loaded_resource = _resource_handlers[resource_type](path, *args, **kwargs)
-    _resource_cache[path] = resource(loaded=loaded_resource, lifespan=lifespan)
+    _resource_cache[path] = resource(loaded=loaded_resource,
+                                     lifespan=lifespan,
+                                     type=resource_type)
     return loaded_resource
+
+
+def cleanup() -> None:
+    for res in _resource_cache.values():
+        _cleanup_resource(res)
+
+
+def _cleanup_resource(resource: resource) -> None:
+    cleaner_upper = _resource_cleaner_uppers[resource.type]
+    if cleaner_upper is not None:
+        cleaner_upper(resource.loaded)
 
 
 def _check_cache(path: str) -> resource:

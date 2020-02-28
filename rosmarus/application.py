@@ -9,6 +9,7 @@ from .util import make_path_safe
 from . import resources
 from . import scene
 from . import controls
+from . import audio
 
 
 class Application:
@@ -83,9 +84,13 @@ class Application:
         major, minor = gl_version
         window = Window(self.name, width, height, GLContext(major, minor))
         try:
+            audio.init()
             initialized = window._initialize()
             self._run_callback(self.on_start)
             yield initialized
         finally:
+            print("Finishing")
             self._run_callback(self.on_exit)
+            resources.cleanup()
+            audio.cleanup()
             window._cleanup()

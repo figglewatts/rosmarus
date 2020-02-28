@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "4eb90fc416b44986347050abd25aeda49931abd02c4f3566438eecba2f757b6e"
+            "sha256": "bac5386df1b5a645a15bd3134a4714fb27d90e933fdc0233008959adf920c71a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -124,6 +124,24 @@
             ],
             "index": "pypi",
             "version": "==1.1.8"
+        },
+        "pyogg": {
+            "hashes": [
+                "sha256:1573b399b05a5417bd28aa5ffbbfa9d4ce535b0890c9644057fb97cadb7ec8df",
+                "sha256:537f44c94e24200a3f7688fb052039e09d4d21edb0a956887e6c406d37e0adbd",
+                "sha256:5a6cf4abc84109bc8fe4dca8e415b66c8d380cbdb991f0a761b0a02cd87f7903"
+            ],
+            "index": "pypi",
+            "version": "==0.6.12a1"
+        },
+        "pyopenal": {
+            "hashes": [
+                "sha256:33ffd00bac6208755d36c744ffe8b5866d10b3c8aac05dfc173d5166df5d76c1",
+                "sha256:6df4ccf1fcb03e5b385a0e68e461ef00c62a1fa3557ac6c669bb50aec45a6cbb",
+                "sha256:da5bfdbe8fb3d2987d60430bec66ec8e51ef52ae8f792c0aa8a370413e712b45"
+            ],
+            "index": "pypi",
+            "version": "==0.7.11a1"
         },
         "pyopengl": {
             "hashes": [

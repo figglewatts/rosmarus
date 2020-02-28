@@ -24,4 +24,8 @@ def load_texture(file_path: str, **kwargs) -> Texture2D:
         return Texture2D(w, h, raw_img_data, **kwargs)
 
 
-resources.register_type_handler("texture", load_texture)
+def cleanup_texture(tex: Texture2D) -> None:
+    tex.cleanup()
+
+
+resources.register_type_handler("texture", load_texture, cleanup_texture)

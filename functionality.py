@@ -25,6 +25,7 @@ from rosmarus import scene
 import rosmarus.log
 from rosmarus import controls
 from rosmarus.controls import InputState
+from rosmarus import audio
 
 
 class TestScene(scene.Scene):
@@ -41,6 +42,11 @@ class TestScene(scene.Scene):
         self.cam.transform.translate(glm.vec3(0, 0, 1))
         self.sb = SpriteBatch(self.cam)
         self.spr_count_x, _ = self.sprsh.get_size_in_sprites()
+
+        self.test_audio: audio.AudioStream = resources.load(
+            "sound", "audio/pulsar-lullaby-short.ogg")
+
+        audio.play(self.test_audio, loop=False)
 
     def render(self, *args, **kwargs):
         self.sb.begin()
