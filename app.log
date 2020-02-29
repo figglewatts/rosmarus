@@ -1,2 +1,2 @@
-2020-02-27 23:49:48,281 [INFO] root: Initialized logging for Rosmarus test
-2020-02-27 23:49:49,462 [WARNING] OpenGL.arrays.numpymodule: Unable to load numpy_formathandler accelerator from OpenGL_accelerate
+2020-02-29 00:31:37,874 [INFO] root: Initialized logging for Rosmarus test
+2020-02-29 00:31:38,272 [WARNING] OpenGL.arrays.numpymodule: Unable to load numpy_formathandler accelerator from OpenGL_accelerate

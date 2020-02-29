@@ -26,6 +26,7 @@ import rosmarus.log
 from rosmarus import controls
 from rosmarus.controls import InputState
 from rosmarus import audio
+from rosmarus.render.tiles import TileMap, Tile
 
 
 class TestScene(scene.Scene):
@@ -37,30 +38,44 @@ class TestScene(scene.Scene):
                                                   "textures/pokemon.png",
                                                   mipmap=None)
         self.sprsh = SpriteSheet(self.poke_tex, 16, 16)
+        self.tilemap = TileMap(self.sprsh,
+                               14,
+                               12,
+                               14,
+                               10,
+                               position=glm.vec2(8, 8))
+        self.tilemap.fill(Tile(7))
+        self.tilemap[0, 0] = Tile(8)
         self.cam = Camera(
             glm.ortho(0, TARGET_WIDTH, 0, TARGET_HEIGHT, 0.01, 100))
         self.cam.transform.translate(glm.vec3(0, 0, 1))
         self.sb = SpriteBatch(self.cam)
-        self.spr_count_x, _ = self.sprsh.get_size_in_sprites()
 
         self.test_audio: audio.AudioStream = resources.load(
             "sound", "audio/pulsar-lullaby-short.ogg")
 
         audio.play(self.test_audio, loop=False)
 
+        controls.add("up", glfw.KEY_W)
+        controls.add("down", glfw.KEY_S)
+        controls.add("left", glfw.KEY_A)
+        controls.add("right", glfw.KEY_D)
+
     def render(self, *args, **kwargs):
         self.sb.begin()
-
-        for y in range(0, 16):
-            for x in range(0, 16):
-                idx = y * self.spr_count_x + x
-                self.sprsh.get_sprite(idx, x_pos=x * 20 + 8,
-                                      y_pos=y * 20 + 8).draw(self.sb)
-
+        self.tilemap.draw(self.sb)
         self.sb.end()
 
     def update(self, delta_time, *args, **kwargs):
-        pass
+        if controls.check("up", InputState.HELD):
+            self.cam.transform.translate(glm.vec3(0, 1, 0))
+        elif controls.check("down", InputState.HELD):
+            self.cam.transform.translate(glm.vec3(0, -1, 0))
+
+        if controls.check("left", InputState.HELD):
+            self.cam.transform.translate(glm.vec3(-1, 0, 0))
+        elif controls.check("right", InputState.HELD):
+            self.cam.transform.translate(glm.vec3(1, 0, 0))
 
 
 TARGET_WIDTH = 200
@@ -92,10 +107,6 @@ def main():
 
         def update(delta_time: float) -> None:
             controls.handle()
-
-            if controls.check("test", InputState.HELD):
-                print("DOWN")
-
             app.scene_manager.update(delta_time)
 
         app.set_render_callback(render)
